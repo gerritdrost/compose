@@ -76,6 +76,7 @@ class Project(object):
         self.volumes = volumes or ProjectVolumes({})
         self.networks = networks or ProjectNetworks({}, False)
         self.config_version = config_version
+        self.default_limit = 16
 
     def labels(self, one_off=OneOffFilter.exclude, legacy=False):
         name = self.name
@@ -287,6 +288,7 @@ class Project(object):
             operator.attrgetter('name'),
             'Starting',
             get_deps,
+            limit=self.default_limit,
             fail_check=lambda obj: not obj.containers(),
         )
 
@@ -307,6 +309,7 @@ class Project(object):
             operator.attrgetter('name'),
             'Stopping',
             get_deps,
+            limit=self.default_limit,
         )
 
     def pause(self, service_names=None, **options):
@@ -358,6 +361,7 @@ class Project(object):
             self.build_container_operation_with_timeout_func('restart', options),
             operator.attrgetter('name'),
             'Restarting',
+            limit=self.default_limit,
         )
         return containers
 
@@ -574,6 +578,7 @@ class Project(object):
             operator.attrgetter('name'),
             None,
             get_deps,
+            limit=self.default_limit,
         )
         if errors:
             raise ProjectError(
